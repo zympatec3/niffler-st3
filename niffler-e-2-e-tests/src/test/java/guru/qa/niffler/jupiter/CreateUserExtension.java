@@ -26,7 +26,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
             authUserDAO.createUser(user);
             userDataUserDAO.createUserInUserData(user);
 
-            context.getStore(USER_NAMESPACE).put("createdUser", user);
+            context.getStore(USER_NAMESPACE).put(context.getUniqueId(), user);
         }
     }
 
@@ -39,7 +39,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-        return extensionContext.getStore(USER_NAMESPACE).get("createdUser");
+        return extensionContext.getStore(USER_NAMESPACE).get(extensionContext.getUniqueId());
     }
 
     private UserEntity createUserEntityFromAnnotation(DBUser annotation) {
