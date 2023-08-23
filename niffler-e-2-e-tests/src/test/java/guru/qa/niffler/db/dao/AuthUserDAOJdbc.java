@@ -105,9 +105,9 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public UserEntity getUserByUsername(String username) {
-        try (Connection conn = authDs.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT * FROM users WHERE username = ?")) {
+        try (Connection conn = authDs.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT * FROM users WHERE username = ?")) {
 
                 ps.setString(1, username);
                 ResultSet rs = ps.executeQuery();
@@ -126,7 +126,6 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
                 } else {
                     throw new IllegalArgumentException("User with username " + username + " not found");
                 }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -134,24 +133,21 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void updateUser(UserEntity user) { // TODO: в оба апдейта желательно транзакцию добавить, чтобы username и там и там менялся, но лень
-        try (Connection conn = authDs.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE users SET username=?, password=?, enabled=?, account_non_expired=?, account_non_locked=?, credentials_non_expired=? WHERE id=?");
-            ) {
+        try (Connection conn = authDs.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "UPDATE users SET password=?, enabled=?, account_non_expired=?, account_non_locked=?, credentials_non_expired=? WHERE id=?")) {
 
-                ps.setString(1, user.getUsername());
-                ps.setString(2, pe.encode(user.getPassword()));
-                ps.setBoolean(3, user.getEnabled());
-                ps.setBoolean(4, user.getAccountNonExpired());
-                ps.setBoolean(5, user.getAccountNonLocked());
-                ps.setBoolean(6, user.getCredentialsNonExpired());
-                ps.setObject(7, user.getId());
+                ps.setString(1, pe.encode(user.getPassword()));
+                ps.setBoolean(2, user.getEnabled());
+                ps.setBoolean(3, user.getAccountNonExpired());
+                ps.setBoolean(4, user.getAccountNonLocked());
+                ps.setBoolean(5, user.getCredentialsNonExpired());
+                ps.setObject(6, user.getId());
 
                 int updatedRows = ps.executeUpdate();
                 if (updatedRows == 0) {
                     throw new IllegalArgumentException("User with id " + user.getId() + " not found");
                 }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -160,18 +156,16 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     @Override
     public int createUserInUserData(UserEntity user) { // TODO: здесь по-хорошему работать с объектом UserDataEntity, но опять же лень
         int createdRows = 0;
-        try (Connection conn = userdataDs.getConnection()) {
-            try (PreparedStatement usersPs = conn.prepareStatement(
-                    "INSERT INTO users (id, username, currency) " +
-                            "VALUES (?, ?, ?)")) {
+        try (Connection conn = userdataDs.getConnection();
+             PreparedStatement usersPs = conn.prepareStatement(
+                     "INSERT INTO users (id, username, currency) " +
+                             "VALUES (?, ?, ?)")) {
 
                 usersPs.setObject(1, user.getId());
                 usersPs.setString(2, user.getUsername());
                 usersPs.setString(3, CurrencyValues.RUB.name());
 
                 createdRows = usersPs.executeUpdate();
-            }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -181,13 +175,12 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void deleteUserByIdInUserData(UUID userId) {
-        try (Connection conn = userdataDs.getConnection()) {
-            try (PreparedStatement usersPs = conn.prepareStatement(
-                    "DELETE FROM users WHERE id = ?")) {
+        try (Connection conn = userdataDs.getConnection();
+             PreparedStatement usersPs = conn.prepareStatement(
+                     "DELETE FROM users WHERE id = ?")) {
 
                 usersPs.setObject(1, userId);
                 usersPs.executeUpdate();
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -195,9 +188,9 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public UserDataEntity getUserInUserDataByUsername(String username) {
-        try (Connection conn = userdataDs.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT * FROM users WHERE username = ?")) {
+        try (Connection conn = userdataDs.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT * FROM users WHERE username = ?")) {
 
                 ps.setString(1, username);
                 ResultSet rs = ps.executeQuery();
@@ -215,7 +208,6 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
                 } else {
                     throw new IllegalArgumentException("User in UserData with username " + username + " not found");
                 }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -223,23 +215,20 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void updateUserInUserData(UserDataEntity user) {
-        try (Connection conn = userdataDs.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE users SET username = ?, currency = ?, firstname = ?, surname = ?, photo = ? WHERE id = ?")) {
+        try (Connection conn = userdataDs.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "UPDATE users SET currency = ?, firstname = ?, surname = ?, photo = ? WHERE id = ?")) {
 
-                ps.setString(1, user.getUsername());
-                ps.setString(2, user.getCurrency().name());
-                ps.setString(3, user.getFirstname());
-                ps.setString(4, user.getSurname());
-                ps.setBytes(5, user.getPhoto());
-                ps.setObject(6, user.getId());
+                ps.setString(1, user.getCurrency().name());
+                ps.setString(2, user.getFirstname());
+                ps.setString(3, user.getSurname());
+                ps.setBytes(4, user.getPhoto());
+                ps.setObject(5, user.getId());
 
                 int updatedRows = ps.executeUpdate();
                 if (updatedRows == 0) {
                     throw new IllegalArgumentException("User in UserData with id " + user.getId() + " not found");
                 }
-
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
