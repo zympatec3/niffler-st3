@@ -5,6 +5,7 @@ import guru.qa.niffler.db.dao.UserDataUserDAO;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.utils.RandomUtils;
 import org.junit.jupiter.api.extension.*;
 
 import java.lang.reflect.Field;
@@ -44,8 +45,11 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     private UserEntity createUserEntityFromAnnotation(DBUser annotation) {
         UserEntity user = new UserEntity();
-        user.setUsername(annotation.username());
-        user.setPassword(annotation.password());
+        String username = annotation.username().isEmpty() ? RandomUtils.generateUsername() : annotation.username();
+        String password = annotation.password().isEmpty() ? RandomUtils.generatePassword() : annotation.password();
+
+        user.setUsername(username);
+        user.setPassword(password);
         user.setEnabled(true);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);

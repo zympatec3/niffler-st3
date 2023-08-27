@@ -3,7 +3,6 @@ package guru.qa.niffler.test;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.db.dao.AuthUserDAO;
 import guru.qa.niffler.db.dao.UserDataUserDAO;
-import guru.qa.niffler.db.model.UserDataEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import guru.qa.niffler.jupiter.DBUser;
 import guru.qa.niffler.jupiter.Dao;
@@ -19,7 +18,7 @@ import static com.codeborne.selenide.Selenide.$;
 @ExtendWith(DaoExtension.class)
 public class CreateUserTest extends BaseWebTest {
 
-    private final static String user = "zympawkek16";
+    private final static String user = "zympawkek23";
     private final static String password = "12345";
 
     @Dao
@@ -37,6 +36,17 @@ public class CreateUserTest extends BaseWebTest {
             password = password)
     @Test
     void mainPageShouldBeVisibleAfterLogin(UserEntity currentUser) {
+        Selenide.open("http://127.0.0.1:3000/main");
+        $("a[href*='redirect']").click();
+        $("input[name='username']").setValue(currentUser.getUsername());
+        $("input[name='password']").setValue(currentUser.getPassword());
+        $("button[type='submit']").click();
+        $(".main-content__section-stats").shouldBe(visible);
+    }
+
+    @DBUser()
+    @Test
+    void mainPageShouldBeVisibleAfterLogin1(UserEntity currentUser) {
         Selenide.open("http://127.0.0.1:3000/main");
         $("a[href*='redirect']").click();
         $("input[name='username']").setValue(currentUser.getUsername());
