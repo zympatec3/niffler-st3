@@ -35,15 +35,15 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
             userDataUserDAO.createUserInUserData(userData);
 
-            context.getStore(USER_NAMESPACE).put(makeUserKey(context.getUniqueId()), user);
-            context.getStore(USER_NAMESPACE).put(makeUserDataKey(context.getUniqueId()), userData);
+            context.getStore(USER_NAMESPACE).put(getUserKey(context.getUniqueId()), user);
+            context.getStore(USER_NAMESPACE).put(getUserDataKey(context.getUniqueId()), userData);
         }
     }
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        AuthUserEntity user = context.getStore(USER_NAMESPACE).get(makeUserKey(context.getUniqueId()), AuthUserEntity.class);
-        UserDataUserEntity userData = context.getStore(USER_NAMESPACE).get(makeUserDataKey(context.getUniqueId()), UserDataUserEntity.class);
+        AuthUserEntity user = context.getStore(USER_NAMESPACE).get(getUserKey(context.getUniqueId()), AuthUserEntity.class);
+        UserDataUserEntity userData = context.getStore(USER_NAMESPACE).get(getUserDataKey(context.getUniqueId()), UserDataUserEntity.class);
         userDataUserDAO.deleteUserInUserData(userData);
         authUserDAO.deleteUser(user);
     }
@@ -81,11 +81,11 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
         return user;
     }
 
-    private String makeUserKey(String uniqueId) {
+    private String getUserKey(String uniqueId) {
         return uniqueId + "user";
     }
 
-    private String makeUserDataKey(String uniqueId) {
+    private String getUserDataKey(String uniqueId) {
         return uniqueId + "userdata";
     }
 }
