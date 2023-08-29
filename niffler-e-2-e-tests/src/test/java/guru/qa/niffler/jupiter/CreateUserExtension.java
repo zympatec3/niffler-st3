@@ -1,25 +1,24 @@
 package guru.qa.niffler.jupiter;
 
 import guru.qa.niffler.db.dao.AuthUserDAO;
+import guru.qa.niffler.db.dao.AuthUserDAOJdbc;
 import guru.qa.niffler.db.dao.UserDataUserDAO;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import org.junit.jupiter.api.extension.*;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class CreateUserExtension implements BeforeEachCallback, ParameterResolver {
+public class CreateUserExtension implements BeforeEachCallback, ParameterResolver, AfterTestExecutionCallback {
 
     private static final ExtensionContext.Namespace USER_NAMESPACE = ExtensionContext.Namespace.create(CreateUserExtension.class);
 
+    private static final AuthUserDAO authUserDAO = new AuthUserDAOJdbc();
+    private static final UserDataUserDAO userDataUserDAO = new AuthUserDAOJdbc();
+
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        Object testInstance = context.getRequiredTestInstance();
-        AuthUserDAO authUserDAO = getFieldValue(testInstance, AuthUserDAO.class);
-        UserDataUserDAO userDataUserDAO = getFieldValue(testInstance, UserDataUserDAO.class);
-
         DBUser dbUserAnnotation = context.getRequiredTestMethod().getAnnotation(DBUser.class);
         if (dbUserAnnotation != null) {
             UserEntity user = createUserEntityFromAnnotation(dbUserAnnotation);
@@ -28,6 +27,13 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
             context.getStore(USER_NAMESPACE).put(context.getUniqueId(), user);
         }
+    }
+
+    @Override
+    public void afterTestExecution(ExtensionContext context) throws Exception {
+        var user = context.getStore(USER_NAMESPACE).get(context.getUniqueId(), UserEntity.class);
+        userDataUserDAO.deleteUserByIdInUserData(user.getId());
+        authUserDAO.deleteUserById(user.getId());
     }
 
     @Override
@@ -57,20 +63,6 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
                     return ae;
                 }).toList());
         return user;
-    }
-
-    private <T> T getFieldValue(Object object, Class<T> clazz) {
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (clazz.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-                try {
-                    return clazz.cast(field.get(object));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return null;
     }
 }
 

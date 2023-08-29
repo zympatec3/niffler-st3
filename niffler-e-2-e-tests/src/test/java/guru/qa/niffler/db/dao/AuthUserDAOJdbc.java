@@ -132,7 +132,7 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public void updateUser(UserEntity user) { // TODO: в оба апдейта желательно транзакцию добавить, чтобы username и там и там менялся, но лень
+    public void updateUser(UserEntity user) {
         try (Connection conn = authDs.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                      "UPDATE users SET password=?, enabled=?, account_non_expired=?, account_non_locked=?, credentials_non_expired=? WHERE id=?")) {
