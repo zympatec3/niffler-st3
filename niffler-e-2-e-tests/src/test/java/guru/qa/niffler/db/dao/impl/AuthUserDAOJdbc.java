@@ -1,9 +1,14 @@
-package guru.qa.niffler.db.dao;
+package guru.qa.niffler.db.dao.impl;
 
-import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
-import guru.qa.niffler.db.model.Authority;
+import guru.qa.niffler.db.dao.AuthUserDAO;
+import guru.qa.niffler.db.dao.UserDataUserDAO;
+import guru.qa.niffler.db.jdbc.DataSourceProvider;
 import guru.qa.niffler.db.model.CurrencyValues;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.auth.AuthorityEntity;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -121,8 +126,9 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public UserEntity getUserById(UUID userId) {
-        UserEntity user = new UserEntity();
+    public AuthUserEntity getUserById(UUID userId) {
+        AuthUserEntity user = new AuthUserEntity();
+        boolean userDataFetched = false;
         try (Connection conn = authDs.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                      "SELECT * FROM users u JOIN authorities a ON u.id = a.user_id WHERE u.id = ?")) {
@@ -154,23 +160,8 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public int createUserInUserData(UserEntity user) {
-        int createdRows;
-        try (Connection conn = userdataDs.getConnection();
-             PreparedStatement usersPs = conn.prepareStatement(
-                     "INSERT INTO users (id, username, currency) " +
-                             "VALUES (?, ?, ?)")) {
-
-            usersPs.setObject(1, user.getId());
-            usersPs.setString(2, user.getUsername());
-            usersPs.setString(3, CurrencyValues.RUB.name());
-
-            createdRows = usersPs.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return createdRows;
+    public int createUserInUserData(UserDataUserEntity user) {
+        return 0;
     }
 
     @Override

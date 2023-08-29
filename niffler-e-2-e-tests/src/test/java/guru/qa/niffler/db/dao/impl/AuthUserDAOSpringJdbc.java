@@ -1,13 +1,16 @@
-package guru.qa.niffler.db.dao;
+package guru.qa.niffler.db.dao.impl;
 
-import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
-import guru.qa.niffler.db.mapper.AuthorityEntityRowMapper;
-import guru.qa.niffler.db.mapper.UserEntityRowMapper;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
+import guru.qa.niffler.db.dao.AuthUserDAO;
+import guru.qa.niffler.db.dao.UserDataUserDAO;
+import guru.qa.niffler.db.jdbc.DataSourceProvider;
 import guru.qa.niffler.db.model.CurrencyValues;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.auth.AuthorityEntity;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+import guru.qa.niffler.db.springjdbc.AuthorityEntityRowMapper;
+import guru.qa.niffler.db.springjdbc.UserEntityRowMapper;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -89,16 +92,16 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
+    public void deleteUser(AuthUserEntity userId) {
         authTtpl.execute(status -> {
             authJdbcTemplate.update(con -> {
                 PreparedStatement authorityPs = con.prepareStatement("DELETE from authorities WHERE user_id = ?");
-                authorityPs.setObject(1, userId);
+                authorityPs.setObject(1, userId.getId());
                 return authorityPs;
             });
             authJdbcTemplate.update(con -> {
                 PreparedStatement usersPs = con.prepareStatement("DELETE from users WHERE id = ?");
-                usersPs.setObject(1, userId);
+                usersPs.setObject(1, userId.getId());
                 return usersPs;
             });
             return 0;

@@ -1,28 +1,28 @@
 package guru.qa.niffler.db.dao;
 
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
 
 import java.util.UUID;
 
 public class AuthUserDAOHibernate implements AuthUserDAO {
 
     @Override
-    public int createUser(UserEntity user) {
+    public int createUser(AuthUserEntity user) {
         return 0;
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public AuthUserEntity updateUser(AuthUserEntity user) {
         return null;
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
+    public void deleteUser(AuthUserEntity userId) {
 
     }
 
     @Override
-    public UserEntity getUserById(UUID userId) {
+    public AuthUserEntity getUserById(UUID userId) {
         return null;
     }
 }
