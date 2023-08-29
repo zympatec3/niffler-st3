@@ -1,13 +1,15 @@
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.db.dao.AuthUserDAO;
 import guru.qa.niffler.db.dao.UserDataUserDAO;
-import guru.qa.niffler.db.dao.impl.AuthUserDAOSpringJdbc;
+import guru.qa.niffler.db.dao.impl.AuthUserDAOHibernate;
+import guru.qa.niffler.db.dao.impl.UserdataUserDAOHibernate;
 import guru.qa.niffler.db.model.CurrencyValues;
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.db.model.auth.Authority;
 import guru.qa.niffler.db.model.auth.AuthorityEntity;
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.utils.RandomUtils;
 import org.junit.jupiter.api.extension.*;
 
@@ -17,8 +19,8 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     private static final ExtensionContext.Namespace USER_NAMESPACE = ExtensionContext.Namespace.create(CreateUserExtension.class);
 
-    private static final AuthUserDAO authUserDAO = new AuthUserDAOSpringJdbc();
-    private static final UserDataUserDAO userDataUserDAO = new AuthUserDAOSpringJdbc();
+    private static final AuthUserDAO authUserDAO = new AuthUserDAOHibernate();
+    private static final UserDataUserDAO userDataUserDAO = new UserdataUserDAOHibernate();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -28,20 +30,21 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
             authUserDAO.createUser(user);
 
             UserDataUserEntity userData = new UserDataUserEntity();
-            userData.setId(user.getId());
             userData.setUsername(user.getUsername());
-            userData.setCurrency(CurrencyValues.USD);
+            userData.setCurrency(CurrencyValues.RUB);
 
             userDataUserDAO.createUserInUserData(userData);
 
-            context.getStore(USER_NAMESPACE).put(context.getUniqueId(), user);
+            context.getStore(USER_NAMESPACE).put(makeUserKey(context.getUniqueId()), user);
+            context.getStore(USER_NAMESPACE).put(makeUserDataKey(context.getUniqueId()), userData);
         }
     }
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        var user = context.getStore(USER_NAMESPACE).get(context.getUniqueId(), AuthUserEntity.class);
-        userDataUserDAO.deleteUserByIdInUserData(user.getId());
+        AuthUserEntity user = context.getStore(USER_NAMESPACE).get(makeUserKey(context.getUniqueId()), AuthUserEntity.class);
+        UserDataUserEntity userData = context.getStore(USER_NAMESPACE).get(makeUserDataKey(context.getUniqueId()), UserDataUserEntity.class);
+        userDataUserDAO.deleteUserInUserData(userData);
         authUserDAO.deleteUser(user);
     }
 
@@ -54,7 +57,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-        return extensionContext.getStore(USER_NAMESPACE).get(extensionContext.getUniqueId());
+        return extensionContext.getStore(USER_NAMESPACE).get(extensionContext.getUniqueId() + "user", AuthUserEntity.class);
     }
 
     private AuthUserEntity createUserEntityFromAnnotation(DBUser annotation) {
@@ -72,9 +75,18 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
                 .map(a -> {
                     AuthorityEntity ae = new AuthorityEntity();
                     ae.setAuthority(a);
+                    ae.setUser(user);
                     return ae;
                 }).toList());
         return user;
+    }
+
+    private String makeUserKey(String uniqueId) {
+        return uniqueId + "user";
+    }
+
+    private String makeUserDataKey(String uniqueId) {
+        return uniqueId + "userdata";
     }
 }
 

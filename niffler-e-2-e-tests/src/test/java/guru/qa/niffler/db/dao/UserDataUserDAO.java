@@ -8,7 +8,5 @@ public interface UserDataUserDAO {
 
     int createUserInUserData(UserDataUserEntity user);
 
-    void deleteUserByIdInUserData(UUID userId);
-
-    void deleteUserByUsernameInUserData(String username);
+    void deleteUserInUserData(UserDataUserEntity user);
 }

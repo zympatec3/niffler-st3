@@ -45,6 +45,25 @@ public class AuthUserEntity {
     @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<AuthorityEntity> authorities = new ArrayList<>();
 
+    public AuthUserEntity() {
+    }
+
+    public AuthUserEntity(AuthUserEntity other) {
+        this.id = other.id;
+        this.username = other.username;
+        this.password = other.password;
+        this.enabled = other.enabled;
+        this.accountNonExpired = other.accountNonExpired;
+        this.accountNonLocked = other.accountNonLocked;
+        this.credentialsNonExpired = other.credentialsNonExpired;
+        this.authorities = new ArrayList<>();
+        for (AuthorityEntity authority : other.getAuthorities()) {
+            AuthorityEntity newAuthority = new AuthorityEntity(authority);
+            newAuthority.setUser(this); // set the back-reference
+            this.authorities.add(newAuthority);
+        }
+    }
+
     public UUID getId() {
         return id;
     }

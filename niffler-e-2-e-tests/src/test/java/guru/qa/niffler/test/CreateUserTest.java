@@ -2,7 +2,7 @@ package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
-import guru.qa.niffler.jupiter.DBUser;
+import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Condition.visible;
@@ -10,7 +10,7 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class CreateUserTest extends BaseWebTest {
 
-    private final static String user = "zympawkek25";
+    private final static String user = "zympawkek42";
     private final static String password = "12345";
 
     @DBUser(username = user,
