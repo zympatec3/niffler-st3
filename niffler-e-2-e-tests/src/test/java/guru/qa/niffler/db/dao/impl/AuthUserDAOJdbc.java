@@ -3,9 +3,7 @@ package guru.qa.niffler.db.dao;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.CurrencyValues;
-import guru.qa.niffler.db.model.UserEntity;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,7 +18,7 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     private static DataSource userdataDs = DataSourceProvider.INSTANCE.getDataSource(ServiceDB.USERDATA);
 
     @Override
-    public int createUser(UserEntity user) {
+    public int createUser(AuthUserEntity user) {
         int createdRows = 0;
         try (Connection conn = authDs.getConnection()) {
 
@@ -74,7 +72,7 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public AuthUserEntity updateUser(AuthUserEntity user) {
         try (Connection conn = authDs.getConnection();
              PreparedStatement usersPs = conn.prepareStatement(
                      "UPDATE users SET " +
@@ -99,20 +97,16 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
+    public void deleteUser(AuthUserEntity userId) {
         try (Connection conn = authDs.getConnection()) {
             conn.setAutoCommit(false);
+            try (PreparedStatement usersPs = conn.prepareStatement("DELETE FROM users WHERE id = ?");
+                 PreparedStatement authorityPs = conn.prepareStatement("DELETE FROM authorities WHERE user_id = ?")) {
 
-            try (PreparedStatement authorityPs = conn.prepareStatement(
-                    "DELETE FROM authorities WHERE user_id = ?");
+                authorityPs.setObject(1, userId.getId());
+                usersPs.setObject(1, userId.getId());
 
-                 PreparedStatement usersPs = conn.prepareStatement(
-                         "DELETE FROM users WHERE id = ?")) {
-
-                authorityPs.setObject(1, userId);
                 authorityPs.executeUpdate();
-
-                usersPs.setObject(1, userId);
                 usersPs.executeUpdate();
 
                 conn.commit();
@@ -129,7 +123,6 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     @Override
     public UserEntity getUserById(UUID userId) {
         UserEntity user = new UserEntity();
-        boolean userDataFetched = false;
         try (Connection conn = authDs.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                      "SELECT * FROM users u JOIN authorities a ON u.id = a.user_id WHERE u.id = ?")) {
@@ -160,10 +153,9 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
         return user;
     }
 
-
     @Override
-    public int createUserInUserData(UserEntity user) { // TODO: здесь по-хорошему работать с объектом UserDataEntity, но опять же лень
-        int createdRows = 0;
+    public int createUserInUserData(UserEntity user) {
+        int createdRows;
         try (Connection conn = userdataDs.getConnection();
              PreparedStatement usersPs = conn.prepareStatement(
                      "INSERT INTO users (id, username, currency) " +

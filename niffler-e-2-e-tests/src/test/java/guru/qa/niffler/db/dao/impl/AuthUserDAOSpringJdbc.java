@@ -42,7 +42,7 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public int createUser(UserEntity user) {
+    public int createUser(AuthUserEntity user) {
         return authTtpl.execute(status -> {
             KeyHolder kh = new GeneratedKeyHolder();
 
@@ -76,7 +76,7 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public AuthUserEntity updateUser(AuthUserEntity user) {
         authJdbcTemplate.update("UPDATE users SET password = ?, enabled = ?, account_non_expired = ?," +
                         "account_non_locked = ? WHERE id = ?",
                 pe.encode(user.getPassword()),
@@ -106,8 +106,8 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public UserEntity getUserById(UUID userId) {
-        UserEntity user = authJdbcTemplate.queryForObject(
+    public AuthUserEntity getUserById(UUID userId) {
+        AuthUserEntity user = authJdbcTemplate.queryForObject(
                 "SELECT * FROM users WHERE id = ?",
                 UserEntityRowMapper.instance,
                 userId
@@ -124,7 +124,7 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    public int createUserInUserData(UserEntity user) {
+    public int createUserInUserData(UserDataUserEntity user) {
         return userdataJdbcTemplate.update(
                 "INSERT INTO users (id, username, currency) VALUES (?, ?, ?)",
                 user.getId(),
