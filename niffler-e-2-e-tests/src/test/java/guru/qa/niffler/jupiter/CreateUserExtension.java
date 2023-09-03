@@ -31,7 +31,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        var user = context.getStore(USER_NAMESPACE).get(context.getUniqueId(), UserEntity.class);
+        UserEntity user = context.getStore(USER_NAMESPACE).get(context.getUniqueId(), UserEntity.class);
         userDataUserDAO.deleteUserByIdInUserData(user.getId());
         authUserDAO.deleteUserById(user.getId());
     }

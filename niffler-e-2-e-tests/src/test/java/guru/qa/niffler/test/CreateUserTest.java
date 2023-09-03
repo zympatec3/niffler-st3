@@ -10,7 +10,7 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class CreateUserTest extends BaseWebTest {
 
-    private final static String user = "zympawkek25";
+    private final static String user = "zympawkek50";
     private final static String password = "12345";
 
     @DBUser(username = user,

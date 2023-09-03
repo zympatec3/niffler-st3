@@ -150,10 +150,11 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
     public int createUserInUserData(UserEntity user) {
         int createdRows;
         try (Connection conn = userdataDs.getConnection();
-             PreparedStatement usersPs = conn.prepareStatement("INSERT INTO users (username, currency) VALUES (?, ?)")) {
+             PreparedStatement usersPs = conn.prepareStatement("INSERT INTO users (id, username, currency) VALUES (?, ?, ?)")) {
 
-            usersPs.setString(1, user.getUsername());
-            usersPs.setString(2, CurrencyValues.RUB.name());
+            usersPs.setObject(1, user.getId());
+            usersPs.setString(2, user.getUsername());
+            usersPs.setString(3, CurrencyValues.RUB.name());
 
             createdRows = usersPs.executeUpdate();
         } catch (SQLException e) {
@@ -164,7 +165,7 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void deleteUserByIdInUserData(UUID userId) {
-        try (Connection conn = authDs.getConnection();
+        try (Connection conn = userdataDs.getConnection();
              PreparedStatement usersPs = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
             usersPs.setObject(1, userId);
             usersPs.executeUpdate();
@@ -175,7 +176,7 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void deleteUserByUsernameInUserData(String username) {
-        try (Connection conn = authDs.getConnection();
+        try (Connection conn = userdataDs.getConnection();
              PreparedStatement usersPs = conn.prepareStatement("DELETE FROM users WHERE username = ?")) {
             usersPs.setString(1, username);
             usersPs.executeUpdate();
