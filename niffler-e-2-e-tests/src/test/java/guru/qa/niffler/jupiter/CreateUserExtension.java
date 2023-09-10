@@ -1,11 +1,12 @@
 package guru.qa.niffler.jupiter;
 
 import guru.qa.niffler.db.dao.AuthUserDAO;
-import guru.qa.niffler.db.dao.AuthUserDAOJdbc;
+import guru.qa.niffler.db.dao.AuthUserDAOSpringJdbc;
 import guru.qa.niffler.db.dao.UserDataUserDAO;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.utils.RandomUtils;
 import org.junit.jupiter.api.extension.*;
 
 import java.util.Arrays;
@@ -14,8 +15,8 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     private static final ExtensionContext.Namespace USER_NAMESPACE = ExtensionContext.Namespace.create(CreateUserExtension.class);
 
-    private static final AuthUserDAO authUserDAO = new AuthUserDAOJdbc();
-    private static final UserDataUserDAO userDataUserDAO = new AuthUserDAOJdbc();
+    private static final AuthUserDAO authUserDAO = new AuthUserDAOSpringJdbc();
+    private static final UserDataUserDAO userDataUserDAO = new AuthUserDAOSpringJdbc();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -50,8 +51,11 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
 
     private UserEntity createUserEntityFromAnnotation(DBUser annotation) {
         UserEntity user = new UserEntity();
-        user.setUsername(annotation.username());
-        user.setPassword(annotation.password());
+        String username = annotation.username().isEmpty() ? RandomUtils.generateUsername() : annotation.username();
+        String password = annotation.password().isEmpty() ? RandomUtils.generatePassword() : annotation.password();
+
+        user.setUsername(username);
+        user.setPassword(password);
         user.setEnabled(true);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
