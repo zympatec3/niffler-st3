@@ -58,6 +58,7 @@ public class SpendingWebTest extends BaseWebTest {
         $(".spendings__content tbody")
                 .$$("tr")
                 .find(text(createdSpend.getDescription()))
+                .scrollTo()
                 .$("td")
                 .scrollTo()
                 .click();
