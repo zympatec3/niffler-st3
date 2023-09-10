@@ -51,8 +51,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
         return parameterContext.getParameter().getType().isAssignableFrom(AuthUserEntity.class) &&
-                extensionContext.getTestMethod().isPresent() &&
-                extensionContext.getTestMethod().get().isAnnotationPresent(DBUser.class);
+                extensionContext.getRequiredTestMethod().isAnnotationPresent(DBUser.class);
     }
 
     @Override

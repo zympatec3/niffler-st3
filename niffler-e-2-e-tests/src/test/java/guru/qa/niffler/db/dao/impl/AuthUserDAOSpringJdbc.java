@@ -44,7 +44,6 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO, UserDataUserDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public int createUser(AuthUserEntity user) {
         return authTtpl.execute(status -> {
             KeyHolder kh = new GeneratedKeyHolder();
