@@ -1,7 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.db.dao.AuthUserDAO;
-import guru.qa.niffler.db.dao.UserDataUserDAO;
+import guru.qa.niffler.db.dao.UserdataUserDAO;
 import guru.qa.niffler.db.dao.impl.AuthUserDAOHibernate;
 import guru.qa.niffler.db.dao.impl.UserdataUserDAOHibernate;
 import guru.qa.niffler.db.model.CurrencyValues;
@@ -20,10 +20,10 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
     private static final ExtensionContext.Namespace USER_NAMESPACE = ExtensionContext.Namespace.create(CreateUserExtension.class);
 
     private static final AuthUserDAO authUserDAO = new AuthUserDAOHibernate();
-    private static final UserDataUserDAO userDataUserDAO = new UserdataUserDAOHibernate();
+    private static final UserdataUserDAO userDataUserDAO = new UserdataUserDAOHibernate();
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(ExtensionContext context) {
         DBUser dbUserAnnotation = context.getRequiredTestMethod().getAnnotation(DBUser.class);
         if (dbUserAnnotation != null) {
             AuthUserEntity user = createUserEntityFromAnnotation(dbUserAnnotation);
@@ -41,7 +41,7 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
     }
 
     @Override
-    public void afterTestExecution(ExtensionContext context) throws Exception {
+    public void afterTestExecution(ExtensionContext context) {
         AuthUserEntity user = context.getStore(USER_NAMESPACE).get(getUserKey(context.getUniqueId()), AuthUserEntity.class);
         UserDataUserEntity userData = context.getStore(USER_NAMESPACE).get(getUserDataKey(context.getUniqueId()), UserDataUserEntity.class);
         userDataUserDAO.deleteUserInUserData(userData);
