@@ -6,6 +6,7 @@ import guru.qa.niffler.api.AuthServiceClient;
 import guru.qa.niffler.api.context.CookieContext;
 import guru.qa.niffler.api.context.SessionStorageContext;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -19,12 +20,24 @@ public class ApiLoginExtension implements BeforeEachCallback, AfterTestExecution
     private final AuthServiceClient authServiceClient = new AuthServiceClient();
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception {
+    public void beforeEach(ExtensionContext extensionContext) {
         ApiLogin annotation = extensionContext.getRequiredTestMethod().getAnnotation(ApiLogin.class);
         if (annotation != null) {
-            doLogin(annotation.username(), annotation.password());
+            String username = annotation.username();
+            String password = annotation.password();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                AuthUserEntity dbUser = CreateUserExtension.getUserFromContext(extensionContext);
+                if (dbUser != null) {
+                    username = dbUser.getUsername();
+                    password = dbUser.getPassword();
+                }
+            }
+
+            doLogin(username, password);
         }
     }
+
 
     private void doLogin(String username, String password) {
         SessionStorageContext sessionStorageContext = SessionStorageContext.getInstance();
@@ -45,7 +58,7 @@ public class ApiLoginExtension implements BeforeEachCallback, AfterTestExecution
     }
 
     @Override
-    public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
+    public void afterTestExecution(ExtensionContext extensionContext) {
         SessionStorageContext.getInstance().clearContext();
         CookieContext.getInstance().clearContext();
     }

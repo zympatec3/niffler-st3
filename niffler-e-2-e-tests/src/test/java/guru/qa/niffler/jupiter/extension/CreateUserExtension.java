@@ -22,6 +22,10 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
     private static final AuthUserDAO authUserDAO = new AuthUserDAOHibernate();
     private static final UserdataUserDAO userDataUserDAO = new UserdataUserDAOHibernate();
 
+    public static AuthUserEntity getUserFromContext(ExtensionContext context) {
+        return context.getStore(USER_NAMESPACE).get(getUserKey(context.getUniqueId()), AuthUserEntity.class);
+    }
+
     @Override
     public void beforeEach(ExtensionContext context) {
         DBUser dbUserAnnotation = context.getRequiredTestMethod().getAnnotation(DBUser.class);
@@ -80,11 +84,11 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
         return user;
     }
 
-    private String getUserKey(String uniqueId) {
+    private static String getUserKey(String uniqueId) {
         return uniqueId + "user";
     }
 
-    private String getUserDataKey(String uniqueId) {
+    private static String getUserDataKey(String uniqueId) {
         return uniqueId + "userdata";
     }
 }
