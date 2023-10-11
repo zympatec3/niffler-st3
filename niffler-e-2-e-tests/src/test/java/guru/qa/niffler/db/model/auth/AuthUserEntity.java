@@ -1,5 +1,6 @@
 package guru.qa.niffler.db.model.auth;
 
+import guru.qa.niffler.model.UserJson;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -143,5 +144,11 @@ public class AuthUserEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, username, password, enabled, accountNonExpired, accountNonLocked, credentialsNonExpired, authorities);
+    }
+
+    public static AuthUserEntity fromUserJson(UserJson userJson) {
+        AuthUserEntity authUser = new AuthUserEntity();
+        authUser.setUsername(userJson.getUsername());
+        return authUser;
     }
 }

@@ -1,19 +1,12 @@
 package guru.qa.niffler.test;
 
 
-import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.jupiter.annotation.ApiLogin;
-import guru.qa.niffler.jupiter.annotation.GenerateUser;
-import guru.qa.niffler.jupiter.annotation.GeneratedUser;
-import guru.qa.niffler.jupiter.annotation.IncomeInvitation;
-import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.*;
 import guru.qa.niffler.model.UserJson;
 import io.qameta.allure.AllureId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static guru.qa.niffler.jupiter.annotation.GeneratedUser.Selector.NESTED;
 import static guru.qa.niffler.jupiter.annotation.GeneratedUser.Selector.OUTER;
@@ -53,7 +46,9 @@ public class FriendsWebTest extends BaseWebTest {
 
     @ApiLogin(
             user = @GenerateUser(
-                    incomeInvitations = @IncomeInvitation
+                    incomeInvitations = @IncomeInvitation(
+                            count = 3
+                    )
             )
     )
     @GenerateUser

@@ -28,8 +28,19 @@ public abstract class AbstractUserRepository implements UserRepository {
         authUserDAO.deleteUser(user);
     }
 
+    @Override
+    public UserDataUserEntity getUserData(AuthUserEntity user) {
+        return udUserDAO.getUserInUserDataByUsername(user.getUsername());
+    }
+
+    @Override
+    public void addFriendForUser(UserDataUserEntity user, UserDataUserEntity friend, boolean pending) {
+        udUserDAO.addFriendForUser(user, friend, pending);
+    }
+
     private UserDataUserEntity fromAuthUser(AuthUserEntity user) {
         UserDataUserEntity userdataUser = new UserDataUserEntity();
+        userdataUser.setId(user.getId());
         userdataUser.setUsername(user.getUsername());
         userdataUser.setCurrency(CurrencyValues.RUB);
         return userdataUser;
