@@ -24,6 +24,11 @@ public class DockerConfig implements Config {
     }
 
     @Override
+    public String nifflerUserDataUrl() {
+        return null;
+    }
+
+    @Override
     public String nifflerFrontUrl() {
         return "http://frontend.niffler.dc";
     }

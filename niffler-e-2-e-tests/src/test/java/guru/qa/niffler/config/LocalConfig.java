@@ -29,6 +29,11 @@ public class LocalConfig implements Config {
     }
 
     @Override
+    public String nifflerUserDataUrl() {
+        return "http://127.0.0.1:8090";
+    }
+
+    @Override
     public String nifflerAuthUrl() {
         return "http://127.0.0.1:9000";
     }

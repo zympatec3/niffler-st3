@@ -139,7 +139,8 @@ public class UsersDAOSpringJdbc implements AuthUserDAO, UserdataUserDAO {
     @Override
     public int createUserInUserData(UserDataUserEntity user) {
         return userdataJdbcTpl.update(
-                "INSERT INTO \"user\" (username, currency) VALUES (?, ?)",
+                "INSERT INTO \"user\" (id, username, currency) VALUES (?, ?, ?)",
+                user.getId(),
                 user.getUsername(),
                 CurrencyValues.RUB.name()
         );
@@ -157,5 +158,21 @@ public class UsersDAOSpringJdbc implements AuthUserDAO, UserdataUserDAO {
                 UserDataUserEntityRowMapper.instance,
                 username
         );
+    }
+
+    @Override
+    public void addFriendForUser(UserDataUserEntity user, UserDataUserEntity friend, boolean pending) {
+        userdataTransactionTpl.execute(status -> {
+            userdataJdbcTpl.update("INSERT INTO friendship (user_id, friend_id, pending) VALUES (?, ?, ?)",
+                    user.getId(), friend.getId(), pending);
+            return null;
+        });
+        if (!pending) {
+            userdataTransactionTpl.execute(status -> {
+                userdataJdbcTpl.update("INSERT INTO friendship (user_id, friend_id, pending) VALUES (?, ?, ?)",
+                        friend.getId(), user.getId(), false);
+                return null;
+            });
+        }
     }
 }

@@ -237,4 +237,9 @@ public class UsersDAOJdbc implements AuthUserDAO, UserdataUserDAO {
         }
         return user;
     }
+
+    @Override
+    public void addFriendForUser(UserDataUserEntity user, UserDataUserEntity friend, boolean pending) {
+
+    }
 }
