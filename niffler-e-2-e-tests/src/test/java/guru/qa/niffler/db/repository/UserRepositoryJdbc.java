@@ -1,10 +1,10 @@
 package guru.qa.niffler.db.repository;
 
 
-import guru.qa.niffler.db.dao.impl.AuthUserDAOJdbc;
+import guru.qa.niffler.db.dao.impl.UsersDAOJdbc;
 
 public class UserRepositoryJdbc extends AbstractUserRepository {
     public UserRepositoryJdbc() {
-        super(new AuthUserDAOJdbc(), new AuthUserDAOJdbc());
+        super(new UsersDAOJdbc(), new UsersDAOJdbc());
     }
 }
