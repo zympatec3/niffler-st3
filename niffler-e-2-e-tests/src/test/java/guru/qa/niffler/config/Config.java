@@ -27,5 +27,9 @@ public interface Config {
         return 5432;
     }
 
+    String currencyGrpcAddress();
+
+    int currencyGrpcPort();
+
     String nifflerAuthUrl();
 }
